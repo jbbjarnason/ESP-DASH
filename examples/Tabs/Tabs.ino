@@ -32,6 +32,7 @@
   #include <ESPAsyncWebServer.h>
 #endif
 #include <ESPDash.h>
+using namespace ESPDash;
 
 
 /* Your WiFi Credentials */
@@ -42,7 +43,7 @@ const char* password = ""; // Password
 AsyncWebServer server(80);
 
 /* Attach ESP-DASH to AsyncWebServer */
-ESPDash dashboard(&server); 
+ESPDash::ESPDash dashboard(&server);
 
 /* 
   Dashboard Cards 
