@@ -37,19 +37,19 @@ Github URL: https://github.com/ayushsharma82/ESP-DASH
 #include "ESPAsyncWebServer.h"
 #include "ArduinoJson.h"
 #include "Widget.h"
-#include "Card.h"
-#include "Chart.h"
-#include "Tab.h"
+#include "CardImpl.h"
+#include "ChartImpl.h"
+#include "TabImpl.h"
 
 
 // ESPDASH Class
-class ESPDash{
+class ESPDashImpl{
   private:
     AsyncWebServer* _server = nullptr;
     AsyncWebSocket* _ws = nullptr;
 
-    Vector<Tab*> tabs;
-    Tab* home_screen;
+    Vector<TabImpl*> tabs;
+    TabImpl* home_screen;
     uint32_t current_tab_id;
     bool stats_enabled = false;
     bool basic_auth = false;
@@ -68,7 +68,7 @@ class ESPDash{
     OnWebSocketEvent onWebSocketEvent();
 
     // Get tab pointer from tab id
-    Tab* getTab(uint32_t id);
+    TabImpl* getTab(uint32_t id);
 
     // Propagate event to cards in play
     void resolveCardCallback(uint32_t id, int value);
@@ -80,37 +80,35 @@ class ESPDash{
     // Generate layout for specific tab id
     JsonDocument generateLayout(uint32_t id);
 
-    // This method is called when a card/chart is added or removed
-    void refreshLayout();
-
   public:
 
-    ESPDash(AsyncWebServer* server, bool enable_stats = true);
+    ESPDashImpl(AsyncWebServer* server, bool enable_stats = true);
 
     // Set Authentication
     void setAuthentication(const char *user, const char *pass);
 
     // Add Tab
-    void add(Tab *tab);
+    void add(TabImpl *tab);
     // Remove Tab
-    void remove(Tab *tab);
+    void remove(TabImpl *tab);
 
     // Add Card
-    void add(Card *card);
+    void add(CardImpl *card);
     // Remove Card
-    void remove(Card *card);
+    void remove(CardImpl *card);
 
     // Add Chart
-    void add(Chart *chart);
+    void add(ChartImpl *chart);
     // Remove Chart
-    void remove(Chart *chart);
+    void remove(ChartImpl *chart);
 
     // Notify client side to update values
     void sendUpdates();
-  
-    ~ESPDash();
 
-    friend class Tab;
+    // This method is called when a card/chart is added or removed. Internally
+    void refreshLayout();
+  
+    ~ESPDashImpl();
 };
 
 #endif

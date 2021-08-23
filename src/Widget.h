@@ -12,7 +12,7 @@ struct WidgetNames {
   const char* type;
 };
 
-class Tab;
+class TabImpl;
 
 class Widget {
   public:
@@ -31,6 +31,10 @@ class Widget {
     uint32_t getId() const {
       return _id;
     };
+
+    virtual JsonDocument generateLayout() = 0;
+    virtual JsonDocument generateUpdate() = 0;
+
     virtual ~Widget() = default;
 
   protected:
@@ -38,9 +42,4 @@ class Widget {
     String _name;
     int   _type;
     bool  _changed;
-
-    virtual JsonDocument generateLayout() = 0;
-    virtual JsonDocument generateUpdate() = 0;
-
-    friend class Tab;
 };

@@ -1,10 +1,10 @@
-#include "Tab.h"
-#include "ESPDash.h"
+#include "TabImpl.h"
+#include "ESPDashImpl.h"
 
 /*
   Constructor
 */
-Tab::Tab(ESPDash *dashboard, const char *name, const char *navbarName, const char *header):
+TabImpl::TabImpl(ESPDashImpl *dashboard, const char *name, const char *navbarName, const char *header):
   _dashboard(dashboard),
   _name(name),
   _navbarName(navbarName),
@@ -19,26 +19,26 @@ Tab::Tab(ESPDash *dashboard, const char *name, const char *navbarName, const cha
 }
 
 // Add Card
-Tab& Tab::add(Card *card) {
+TabImpl& TabImpl::add(CardImpl *card) {
   return add(card, _cards);
 }
 
 // Remove Card
-Tab& Tab::remove(Card *card) {
+TabImpl& TabImpl::remove(CardImpl *card) {
   return remove(card, _cards);
 }
 
 // Add Chart
-Tab& Tab::add(Chart *chart) {
+TabImpl& TabImpl::add(ChartImpl *chart) {
   return add(chart, _charts);
 }
 
 // Remove Chart
-Tab& Tab::remove(Chart *chart) {
+TabImpl& TabImpl::remove(ChartImpl *chart) {
   return remove(chart, _charts);
 }
 
-Tab::JsonDocument Tab::toJSON() {
+TabImpl::JsonDocument TabImpl::toJSON() {
   JsonDocument doc(256);
   doc["id"] = _id;
   doc["name"] = _name;
@@ -48,7 +48,7 @@ Tab::JsonDocument Tab::toJSON() {
 }
 
 template<class Object>
-void Tab::mergeEntitiesToJSON(Vector<Object*>& container, JsonArray& jsonEntities, bool onlyChanged) {
+void TabImpl::mergeEntitiesToJSON(Vector<Object*>& container, JsonArray& jsonEntities, bool onlyChanged) {
   for(int i = 0; i < container.Size(); i++) {
     if (onlyChanged) {
       if (container[i]->isChanged())
@@ -59,7 +59,7 @@ void Tab::mergeEntitiesToJSON(Vector<Object*>& container, JsonArray& jsonEntitie
   }
 }
 
-Tab::JsonDocument Tab::makeDocument(const String& command) {
+TabImpl::JsonDocument TabImpl::makeDocument(const String& command) {
   auto nrOfEntities = _cards.Size() + _charts.Size();
   JsonDocument doc(nrOfEntities * WIDGET_JSON_SIZE);
 
@@ -68,7 +68,7 @@ Tab::JsonDocument Tab::makeDocument(const String& command) {
   return std::move(doc);
 }
 
-Tab::JsonDocument Tab::generateLayout() {
+TabImpl::JsonDocument TabImpl::generateLayout() {
   auto doc = makeDocument(String("updateLayout"));
   doc["version"] = "1";
 
@@ -84,7 +84,7 @@ Tab::JsonDocument Tab::generateLayout() {
   return std::move(doc);
 }
 
-Tab::JsonDocument Tab::generateUpdates(bool changeOnly) {
+TabImpl::JsonDocument TabImpl::generateUpdates(bool changeOnly) {
   auto doc = makeDocument(String("updates"));
 
   auto jsonCards = doc.createNestedArray("cards");
@@ -96,19 +96,19 @@ Tab::JsonDocument Tab::generateUpdates(bool changeOnly) {
   return std::move(doc);
 }
 
-void Tab::refreshLayout() {
+void TabImpl::refreshLayout() {
   _dashboard->refreshLayout();
 }
 
 template<class Object>
-Tab& Tab::add(Object *object, Vector<Object*> &container) {
+TabImpl& TabImpl::add(Object *object, Vector<Object*> &container) {
   container.PushBack(object);
   refreshLayout();
   return *this;
 }
 
 template<class Object>
-Tab& Tab::remove(Object *object, Vector<Object*> &container) {
+TabImpl& TabImpl::remove(Object *object, Vector<Object*> &container) {
   for(int i=0; i < container.Size(); i++){
     auto *p = container[i];
     if(p->getId() == object->getId()) {
@@ -120,8 +120,8 @@ Tab& Tab::remove(Object *object, Vector<Object*> &container) {
   return *this;
 }
 
-void Tab::resolveCardCallback(uint32_t id, int value) {
-  auto findCard = [this, id]() -> Card* {
+void TabImpl::resolveCardCallback(uint32_t id, int value) {
+  auto findCard = [this, id]() -> CardImpl* {
     for (int i = 0; i < _cards.Size(); ++i)
       if (_cards[i]->getId() == id)
         return _cards[i];
@@ -131,6 +131,6 @@ void Tab::resolveCardCallback(uint32_t id, int value) {
     card->resolveCallback(value);
 }
 
-Tab::~Tab() {
+TabImpl::~TabImpl() {
   _dashboard->remove(this);
 }

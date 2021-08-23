@@ -8,8 +8,6 @@
 
 #include "Widget.h"
 
-
-// functions defaults to zero (number card)
 enum {
   GENERIC_CARD,
   TEMPERATURE_CARD,
@@ -21,14 +19,14 @@ enum {
 };
 
 // Forward Declaration
-class ESPDash;
-class Tab;
+class ESPDashImpl;
+class TabImpl;
 
 // Card Class
-class Card: public Widget {
+class CardImpl: public Widget {
   private:
-    ESPDash *_dashboard;
-    Tab *_tab;
+    ESPDashImpl *_dashboard;
+    TabImpl *_tab;
 
     enum { INTEGER, FLOAT, STRING } _value_type;
     union alignas(4) {
@@ -41,14 +39,9 @@ class Card: public Widget {
     String _symbol;
     std::function<void(int value)> _callback = nullptr;
 
-    void resolveCallback(int value);
-
-    Widget::JsonDocument generateLayout() override;
-    Widget::JsonDocument generateUpdate() override;
-
   public:
-    Card(ESPDash *dashboard, const int type, const char* name, const char* symbol = "", const int min = 0, const int max = 0);
-    Card(Tab *tab, const int type, const char* name, const char* symbol = "", const int min = 0, const int max = 0);
+    CardImpl(ESPDashImpl *dashboard, const int type, const char* name, const char* symbol = "", const int min = 0, const int max = 0);
+    CardImpl(TabImpl *tab, const int type, const char* name, const char* symbol = "", const int min = 0, const int max = 0);
     void attachCallback(std::function<void(int)> cb);
     void update(int value);
     void update(int value, const char* symbol);
@@ -60,9 +53,13 @@ class Card: public Widget {
     void update(const char* value, const char* symbol);
     void update(const String &value);
     void update(const String &value, const char* symbol);
-    ~Card();
-  
-    friend class Tab;
+
+    Widget::JsonDocument generateLayout() override;
+    Widget::JsonDocument generateUpdate() override;
+
+    void resolveCallback(int value);
+
+    ~CardImpl();
 };
 
 

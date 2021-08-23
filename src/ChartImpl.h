@@ -8,23 +8,21 @@
 #include "vector.h"
 #include "Widget.h"
 
-// Default to Line Chart
 enum {
   BAR_CHART,
 };
 
-
 enum GraphAxisType { INTEGER, FLOAT, STRING };
 
 // Forward Declaration
-class ESPDash;
-class Tab;
+class ESPDashImpl;
+class TabImpl;
 
 // Chart Class
-class Chart: public Widget{
+class ChartImpl: public Widget{
   private:
-    ESPDash *_dashboard;
-    Tab *_tab;
+    ESPDashImpl *_dashboard;
+    TabImpl *_tab;
 
     GraphAxisType _x_axis_type;
     GraphAxisType _y_axis_type;
@@ -36,20 +34,19 @@ class Chart: public Widget{
     Vector<int> _y_axis_i;
     Vector<float> _y_axis_f;
 
-    Widget::JsonDocument generateLayout() override;
-    Widget::JsonDocument generateUpdate() override;
-
   public:
-    Chart(ESPDash *dashboard, const int type, const char* name);
-    Chart(Tab *tab, const int type, const char* name);
+    ChartImpl(ESPDashImpl *dashboard, const int type, const char* name);
+    ChartImpl(TabImpl *tab, const int type, const char* name);
     void updateX(int arr_x[], size_t x_size);
     void updateX(float arr_x[], size_t x_size);
     void updateX(String arr_x[], size_t x_size);
     void updateY(int arr_y[], size_t y_size);
     void updateY(float arr_y[], size_t y_size);
-    ~Chart();
 
-    friend class Tab;
+    Widget::JsonDocument generateLayout() override;
+    Widget::JsonDocument generateUpdate() override;
+
+    ~ChartImpl();
 };
 
 #endif

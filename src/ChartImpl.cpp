@@ -1,6 +1,6 @@
-#include "Chart.h"
-#include "ESPDash.h"
-#include "Tab.h"
+#include "ChartImpl.h"
+#include "ESPDashImpl.h"
+#include "TabImpl.h"
 
 // Integral type to string pairs events
 // ID, type
@@ -11,7 +11,7 @@ struct WidgetNames chartTags[] = {
 /*
   Constructor
 */
-Chart::Chart(ESPDash *dashboard, const int type, const char* name):
+ChartImpl::ChartImpl(ESPDashImpl *dashboard, const int type, const char* name):
 Widget()
 {
   _dashboard = dashboard;
@@ -21,7 +21,7 @@ Widget()
   _dashboard->add(this);
 }
 
-Chart::Chart(Tab *tab, const int type, const char* name):
+ChartImpl::ChartImpl(TabImpl *tab, const int type, const char* name):
 Widget()
 {
   _tab = tab;
@@ -34,7 +34,7 @@ Widget()
 /*
   Value update methods
 */
-void Chart::updateX(int arr_x[], size_t x_size){
+void ChartImpl::updateX(int arr_x[], size_t x_size){
   _x_axis_type = GraphAxisType::INTEGER;
   if(!_x_axis_i.Empty())
     _x_axis_i.Clear();
@@ -49,7 +49,7 @@ void Chart::updateX(int arr_x[], size_t x_size){
   _changed = true;
 }
 
-void Chart::updateX(float arr_x[], size_t x_size){
+void ChartImpl::updateX(float arr_x[], size_t x_size){
   _x_axis_type = GraphAxisType::FLOAT;
   if(!_x_axis_i.Empty())
     _x_axis_i.Clear();
@@ -64,7 +64,7 @@ void Chart::updateX(float arr_x[], size_t x_size){
   _changed = true;
 }
 
-void Chart::updateX(String arr_x[], size_t x_size){
+void ChartImpl::updateX(String arr_x[], size_t x_size){
   _x_axis_type = GraphAxisType::STRING;
   if(!_x_axis_i.Empty())
     _x_axis_i.Clear();
@@ -79,7 +79,7 @@ void Chart::updateX(String arr_x[], size_t x_size){
   _changed = true;
 }
 
-void Chart::updateY(int arr_y[], size_t y_size){
+void ChartImpl::updateY(int arr_y[], size_t y_size){
   _y_axis_type = GraphAxisType::INTEGER;
   if(!_y_axis_i.Empty())
     _y_axis_i.Clear();
@@ -92,7 +92,7 @@ void Chart::updateY(int arr_y[], size_t y_size){
   _changed = true;
 }
 
-void Chart::updateY(float arr_y[], size_t y_size){
+void ChartImpl::updateY(float arr_y[], size_t y_size){
   _y_axis_type = GraphAxisType::FLOAT;
   if(!_y_axis_i.Empty())
     _y_axis_i.Clear();
@@ -105,14 +105,14 @@ void Chart::updateY(float arr_y[], size_t y_size){
   _changed = true;
 }
 
-Widget::JsonDocument Chart::generateLayout() {
+Widget::JsonDocument ChartImpl::generateLayout() {
   auto doc = generateUpdate();
   doc["name"] = _name;
   doc["type"] = chartTags[_type].type;
   return std::move(doc);
 }
 
-Widget::JsonDocument Chart::generateUpdate() {
+Widget::JsonDocument ChartImpl::generateUpdate() {
   Widget::JsonDocument doc(2048);
   doc["id"] = _id;
 
@@ -155,7 +155,7 @@ Widget::JsonDocument Chart::generateUpdate() {
 /*
   Destructor
 */
-Chart::~Chart(){
+ChartImpl::~ChartImpl(){
   if (_dashboard)
     _dashboard->remove(this);
   if (_tab)

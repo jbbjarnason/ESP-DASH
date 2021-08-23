@@ -1,16 +1,16 @@
-#include "ESPDash.h"
+#include "ESPDashImpl.h"
 
 /*
   Constructor
 */
-ESPDash::ESPDash(AsyncWebServer* server, bool enable_stats):
+ESPDashImpl::ESPDashImpl(AsyncWebServer* server, bool enable_stats):
   _server(server),
   stats_enabled(enable_stats)
 {
   // Initialize AsyncWebSocket
   _ws = new AsyncWebSocket("/dashws");
 
-  home_screen = new Tab(this, "Home", "Overview", "");
+  home_screen = new TabImpl(this, "Home", "Overview", "");
   current_tab_id = home_screen->getId();
 
   // Attach AsyncWebServer Routes
@@ -24,7 +24,7 @@ ESPDash::ESPDash(AsyncWebServer* server, bool enable_stats):
 }
 
 
-void ESPDash::setAuthentication(const char *user, const char *pass) {
+void ESPDashImpl::setAuthentication(const char *user, const char *pass) {
   username = user;
   password = pass;
   basic_auth = true;
@@ -32,13 +32,13 @@ void ESPDash::setAuthentication(const char *user, const char *pass) {
 }
 
 // Add Tab
-void ESPDash::add(Tab *tab) {
+void ESPDashImpl::add(TabImpl *tab) {
   tabs.PushBack(tab);
   refreshLayout();
 }
 
 // Remove Tab
-void ESPDash::remove(Tab *tab) {
+void ESPDashImpl::remove(TabImpl *tab) {
   for(int i=0; i < tabs.Size(); i++){
     auto *p = tabs[i];
     if(p->getId() == tab->getId()) {
@@ -50,27 +50,27 @@ void ESPDash::remove(Tab *tab) {
 }
 
 // Add Card
-void ESPDash::add(Card *card) {
+void ESPDashImpl::add(CardImpl *card) {
   home_screen->add(card);
 }
 
 // Remove Card
-void ESPDash::remove(Card *card) {
+void ESPDashImpl::remove(CardImpl *card) {
   home_screen->remove(card);
 }
 
 // Add Chart
-void ESPDash::add(Chart *chart) {
+void ESPDashImpl::add(ChartImpl *chart) {
   home_screen->add(chart);
 }
 
 // Remove Chart
-void ESPDash::remove(Chart *chart) {
+void ESPDashImpl::remove(ChartImpl *chart) {
   home_screen->remove(chart);
 }
 
 /* Send Card Updates to all clients */
-void ESPDash::sendUpdates() {
+void ESPDashImpl::sendUpdates() {
   if (auto tab = getTab(current_tab_id)) {
     String update;
     serializeJson(tab->generateUpdates(false), update);
@@ -78,7 +78,7 @@ void ESPDash::sendUpdates() {
   } // else todo: log error
 }
 
-ESPDash::OnWebServerRequest ESPDash::onWebServerRequest() {
+ESPDashImpl::OnWebServerRequest ESPDashImpl::onWebServerRequest() {
   return [this](AsyncWebServerRequest *request) {
     if(basic_auth){
       if(!request->authenticate(username, password))
@@ -91,7 +91,7 @@ ESPDash::OnWebServerRequest ESPDash::onWebServerRequest() {
   };
 }
 
-ESPDash::OnWebSocketEvent ESPDash::onWebSocketEvent() {
+ESPDashImpl::OnWebSocketEvent ESPDashImpl::onWebSocketEvent() {
   return [this](AsyncWebSocket *server, AsyncWebSocketClient *client, AwsEventType type, void *arg, uint8_t *data, size_t len) {
     StaticJsonDocument<200> json;
     String response;
@@ -148,13 +148,13 @@ ESPDash::OnWebSocketEvent ESPDash::onWebSocketEvent() {
   };
 }
 
-Tab* ESPDash::getTab(uint32_t id) {
+TabImpl* ESPDashImpl::getTab(uint32_t id) {
   for (int i = 0; i < tabs.Size(); ++i)
     if (tabs[i]->getId() == id) return tabs[i];
   return nullptr;
 }
 
-String ESPDash::generateStatsJSON() {
+String ESPDashImpl::generateStatsJSON() {
   if (!stats_enabled)
     return String("{\"command\":\"updateStats\", \"statistics\":{\"enabled\":\"false\"}}");
 
@@ -179,7 +179,7 @@ String ESPDash::generateStatsJSON() {
   return "{\"command\":\"updateStats\", \"statistics\":{" + stats + "}}";
 }
 
-ESPDash::JsonDocument ESPDash::generateLayout(uint32_t id) {
+ESPDashImpl::JsonDocument ESPDashImpl::generateLayout(uint32_t id) {
   auto tab = getTab(id);
 
   auto doc = tab ? tab->generateLayout() : home_screen->generateLayout();
@@ -193,14 +193,14 @@ ESPDash::JsonDocument ESPDash::generateLayout(uint32_t id) {
   return std::move(doc);
 }
 
-void ESPDash::refreshLayout() {
+void ESPDashImpl::refreshLayout() {
   _ws->textAll("{\"command\":\"refreshLayout\"}");
 }
 
 /*
   Destructor
 */
-ESPDash::~ESPDash(){
+ESPDashImpl::~ESPDashImpl(){
   _server->removeHandler(_ws);
   delete _ws;
   delete home_screen;
