@@ -101,7 +101,7 @@ void ESPDash::sendUpdates() {
 ESPDash::OnWebServerRequest ESPDash::onWebServerRequest() {
   return [this](AsyncWebServerRequest *request) {
     if(basic_auth){
-      if(!request->authenticate(username, password))
+      if(!request->authenticate(username.c_str(), password.c_str()))
         return request->requestAuthentication();
     }
     // respond with the compressed frontend

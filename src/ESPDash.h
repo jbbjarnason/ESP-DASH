@@ -41,8 +41,8 @@ class ESPDash{
     uint32_t current_tab_id;
     bool stats_enabled = false;
     bool basic_auth = false;
-    const char *username;
-    const char *password;
+    String username;
+    String password;
 
     using OnWebServerRequest = std::function<void(AsyncWebServerRequest*)>;
     OnWebServerRequest onWebServerRequest();
