@@ -97,6 +97,26 @@ void ESPDash::sendUpdates() {
     ArduinoJson::serializeJson(tab->generateUpdates(false), update);
     _ws->textAll(update);
   } // else todo: log error
+  pending_update = false;
+}
+
+static void onAsyncUpdate(void* arg)
+{
+  auto me = static_cast<ESPDash*>(arg);
+  me->sendUpdates();
+}
+
+void ESPDash::asyncUpdates() {
+  if (pending_update) return;
+  pending_update = true;
+  auto timer_args = esp_timer_create_args_t {
+    .callback = &onAsyncUpdate,
+    .arg = this,
+    .dispatch_method = ESP_TIMER_TASK,
+    .name = "sendUpdatesOnIdle",
+  };
+  ESP_ERROR_CHECK(esp_timer_create(&timer_args, &timer_handle));
+  ESP_ERROR_CHECK(esp_timer_start_once(timer_handle, 1000)); // async update after 1 ms
 }
 
 ESPDash::OnWebServerRequest ESPDash::onWebServerRequest() {

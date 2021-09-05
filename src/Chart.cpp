@@ -15,23 +15,15 @@ struct WidgetNames chartTags[] = {
   Constructor
 */
 Chart::Chart(ESPDash *dashboard, const int type, const char* name):
-Widget()
+Widget(dashboard, type, name)
 {
-  _dashboard = dashboard;
-  _tab = nullptr;
-  _type = type;
-  _name = name;
-  _dashboard->add(this);
+  dashboard->add(this);
 }
 
 Chart::Chart(Tab *tab, const int type, const char* name):
-Widget()
+Widget(tab, type, name)
 {
-  _tab = tab;
-  _dashboard = nullptr;
-  _type = type;
-  _name = name;
-  _tab->add(this);
+  tab->add(this);
 }
 
 /*
@@ -49,7 +41,7 @@ void Chart::updateX(int arr_x[], size_t x_size){
   for(size_t i=0; i < x_size; i++){
     _x_axis_i.PushBack(arr_x[i]);
   }
-  _changed = true;
+  makeChanged();
 }
 
 void Chart::updateX(float arr_x[], size_t x_size){
@@ -64,7 +56,7 @@ void Chart::updateX(float arr_x[], size_t x_size){
   for(size_t i=0; i < x_size; i++){
     _x_axis_f.PushBack(arr_x[i]);
   }
-  _changed = true;
+  makeChanged();
 }
 
 void Chart::updateX(String arr_x[], size_t x_size){
@@ -79,7 +71,7 @@ void Chart::updateX(String arr_x[], size_t x_size){
   for(size_t i=0; i < x_size; i++){
     _x_axis_s.PushBack(arr_x[i].c_str());
   }
-  _changed = true;
+  makeChanged();
 }
 
 void Chart::updateY(int arr_y[], size_t y_size){
@@ -92,7 +84,7 @@ void Chart::updateY(int arr_y[], size_t y_size){
   for(size_t i=0; i < y_size; i++){
     _y_axis_i.PushBack(arr_y[i]);
   }
-  _changed = true;
+  makeChanged();
 }
 
 void Chart::updateY(float arr_y[], size_t y_size){
@@ -105,7 +97,7 @@ void Chart::updateY(float arr_y[], size_t y_size){
   for(size_t i=0; i < y_size; i++){
     _y_axis_f.PushBack(arr_y[i]);
   }
-  _changed = true;
+  makeChanged();
 }
 
 Chart::JsonDocument Chart::generateLayout() {
@@ -160,9 +152,9 @@ Chart::JsonDocument Chart::generateUpdate() {
   Destructor
 */
 Chart::~Chart(){
-  if (_dashboard)
-    _dashboard->remove(this);
   if (_tab)
     _tab->remove(this);
+  else if (_dashboard)
+    _dashboard->remove(this);
 }
 

@@ -77,6 +77,7 @@ class Tab {
     ~Tab();
 
     friend class ESPDash;
+    friend class Widget;
 };
 
 #endif
