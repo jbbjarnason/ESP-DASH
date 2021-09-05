@@ -74,7 +74,7 @@ void setup() {
     Serial.print("Got button new state: ");
     Serial.println(value);
     button.update(value);
-    dashboard.sendUpdates();
+    dashboard.asyncUpdates();
   });
 }
 
@@ -84,7 +84,6 @@ void loop() {
   humidity.update((int)random(0, 100));
   value.update((int)random(42, 1337));
   /* Send Updates to our Dashboard (realtime) */
-  dashboard.sendUpdates();
 
   /* 
     Delay is just for demonstration purposes in this example,

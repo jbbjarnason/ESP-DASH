@@ -21,28 +21,20 @@ struct WidgetNames cardTags[] = {
   Constructor
 */
 Card::Card(ESPDash *dashboard, const int type, const char* name, const char* symbol, const int min, const int max):
-Widget()
+Widget(dashboard, type, name)
 {
-  _dashboard = dashboard;
-  _tab = nullptr;
-  _type = type;
-  _name = name;
   _symbol = symbol;
   _value_min = min;
   _value_max = max;
-  _dashboard->add(this);
+  dashboard->add(this);
 }
 Card::Card(Tab *tab, const int type, const char* name, const char* symbol, const int min, const int max):
-Widget()
+Widget(tab, type, name)
 {
-  _dashboard = nullptr;
-  _tab = tab;
-  _type = type;
-  _name = name;
   _symbol = symbol;
   _value_min = min;
   _value_max = max;
-  _tab->add(this);
+  tab->add(this);
 }
 
 /*
@@ -65,7 +57,7 @@ void Card::update(int value, const char* symbol){
   _value_type = Card::INTEGER;
   _symbol = symbol;
   if(_value_i != value)
-    _changed = true;
+    makeChanged();
   _value_i = value;
 }
 
@@ -77,7 +69,7 @@ void Card::update(int value){
   /* Store new value */
   _value_type = Card::INTEGER;
   if(_value_i != value)
-    _changed = true;
+    makeChanged();
   _value_i = value;
 }
 
@@ -90,7 +82,7 @@ void Card::update(float value, const char* symbol){
   _value_type = Card::FLOAT;
   _symbol = symbol;
   if(_value_f != value)
-    _changed = true;
+    makeChanged();
   _value_f = value;
 }
 
@@ -102,7 +94,7 @@ void Card::update(float value){
   /* Store new value */
   _value_type = Card::FLOAT;
   if(_value_f != value)
-    _changed = true;
+    makeChanged();
   _value_f = value;
 }
 
@@ -117,7 +109,7 @@ void Card::update(const String &value){
 void Card::update(const char* value, const char* symbol){
   if(_value_type == Card::STRING){
     if(strcmp(_value_s.c_str(), value) != 0)
-      _changed = true;
+      makeChanged();
   }
   
   _value_type = Card::STRING;
@@ -128,7 +120,7 @@ void Card::update(const char* value, const char* symbol){
 void Card::update(const char* value){
     if(_value_type == Card::STRING){
     if(strcmp(_value_s.c_str(), value) != 0)
-      _changed = true;
+      makeChanged();
   }
   
   _value_type = Card::STRING;
@@ -144,7 +136,7 @@ void Card::update(bool value, const char* symbol){
   _value_type = Card::INTEGER;
   _symbol = symbol;
   if(_value_i != value)
-    _changed = true;
+    makeChanged();
   _value_i = value;
 }
 
@@ -156,7 +148,7 @@ void Card::update(bool value){
   /* Store new value */
   _value_type = Card::INTEGER;
   if(_value_i != value)
-    _changed = true;
+    makeChanged();
   _value_i = value;
 }
 
@@ -192,8 +184,8 @@ Card::JsonDocument Card::generateUpdate() {
   Destructor
 */
 Card::~Card() {
-  if (_dashboard)
-    _dashboard->remove(this);
   if (_tab)
     _tab->remove(this);
+  else if (_dashboard)
+    _dashboard->remove(this);
 }

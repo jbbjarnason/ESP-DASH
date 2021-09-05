@@ -20,6 +20,7 @@ Github URL: https://github.com/ayushsharma82/ESP-DASH
 
 #include <WString.h>
 #include <ESPAsyncWebServer.h>
+#include <esp_timer.h>
 
 #include "webpage.h"
 #include "vector.h"
@@ -43,6 +44,8 @@ class ESPDash{
     bool basic_auth = false;
     String username;
     String password;
+    esp_timer_handle_t timer_handle;
+    bool pending_update = false;
 
     using OnWebServerRequest = std::function<void(AsyncWebServerRequest*)>;
     OnWebServerRequest onWebServerRequest();
@@ -98,6 +101,9 @@ class ESPDash{
 
     // Notify client side to update values
     void sendUpdates();
+
+    // Notify client when processor has finished its work
+    void asyncUpdates();
   
     ~ESPDash();
 
