@@ -14,9 +14,10 @@ Github URL: https://github.com/ayushsharma82/ESP-DASH
 #ifndef ESPDash_h
 #define ESPDash_h
 
-#include <functional>
 #include <cstdint>
 #include <cstdlib>
+#include <functional>
+#include <memory>
 
 #include <WString.h>
 #include <ESPAsyncWebServer.h>
@@ -33,7 +34,7 @@ Github URL: https://github.com/ayushsharma82/ESP-DASH
 // ESPDASH Class
 class ESPDash{
   private:
-    AsyncWebServer* _server = nullptr;
+    std::shared_ptr<AsyncWebServer> _server{ nullptr };
     AsyncWebSocket* _ws = nullptr;
 
     Vector<Tab*> tabs;
@@ -41,8 +42,8 @@ class ESPDash{
     uint32_t current_tab_id;
     bool stats_enabled = false;
     bool basic_auth = false;
-    const char *username;
-    const char *password;
+    const char *username{ nullptr };
+    const char *password{ nullptr };
 
     using OnWebServerRequest = std::function<void(AsyncWebServerRequest*)>;
     OnWebServerRequest onWebServerRequest();
@@ -70,13 +71,13 @@ class ESPDash{
 
   public:
     ESPDash();
-    ESPDash(AsyncWebServer* server, bool enable_stats = true);
+    ESPDash(const std::shared_ptr<AsyncWebServer>& server, bool enable_stats = true);
 
     // Enable/disable statistics
     ESPDash& displayStatistics(bool enable_stats);
 
     // Late initialize
-    ESPDash& init(AsyncWebServer* server);
+    ESPDash& init(const std::shared_ptr<AsyncWebServer>& server);
 
     // Set Authentication
     void setAuthentication(const char *user, const char *pass);

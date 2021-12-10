@@ -12,7 +12,7 @@ ESPDash::ESPDash()
   current_tab_id = home_screen->getId();
 }
 
-ESPDash::ESPDash(AsyncWebServer* server, bool enable_stats):
+ESPDash::ESPDash(const std::shared_ptr<AsyncWebServer>& server, bool enable_stats):
   stats_enabled(enable_stats)
 {
   init(server);
@@ -25,7 +25,7 @@ ESPDash& ESPDash::displayStatistics(bool enable_stats) {
   return *this;
 }
 
-ESPDash& ESPDash::init(AsyncWebServer *server) {
+ESPDash& ESPDash::init(const std::shared_ptr<AsyncWebServer>& server) {
   _server = server;
 
   // Initialize AsyncWebSocket

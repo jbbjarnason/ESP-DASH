@@ -39,10 +39,10 @@ const char* ssid = ""; // SSID
 const char* password = ""; // Password
 
 /* Start Webserver */
-AsyncWebServer server(80);
+auto server{ std::make_shared<AsyncWebServer>(80) };
 
 /* Attach ESP-DASH to AsyncWebServer */
-ESPDash dashboard(&server);
+ESPDash dashboard(server);
 
 /* 
   Dashboard Charts
@@ -77,7 +77,7 @@ void setup() {
   power.updateX(XAxis, 7);
 
   /* Start AsyncWebServer */
-  server.begin();
+  server->begin();
 }
 
 void loop() {
